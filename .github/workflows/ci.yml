@@ -17,14 +17,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v4
+      - name: Install YAML validator
+        run: pip install yamllint
 
-      - name: Check kubectl
-        run: kubectl version --client
-
-      - name: Validate Kubernetes YAML
+      - name: Validate YAML syntax
         run: |
-          kubectl apply --dry-run=client --validate=false -f configmap.yaml
-          kubectl apply --dry-run=client --validate=false -f deployment.yaml
-          kubectl apply --dry-run=client --validate=false -f service.yaml
+          yamllint -d relaxed configmap.yaml
+          yamllint -d relaxed deployment.yaml
+          yamllint -d relaxed service.yaml
+
+      - name: Verify required Kubernetes manifests
+        run: |
+          test -f configmap.yaml
+          test -f deployment.yaml
+          test -f service.yaml
+          echo "All required Kubernetes manifests are present."

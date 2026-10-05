@@ -30,6 +30,10 @@ spec:
           ports:
             - containerPort: 80
 
+          volumeMounts:
+            - name: nginx-storage
+              mountPath: /usr/share/nginx/html/data
+
           livenessProbe:
             httpGet:
               path: /
@@ -43,3 +47,8 @@ spec:
               port: 80
             initialDelaySeconds: 3
             periodSeconds: 5
+
+      volumes:
+        - name: nginx-storage
+          persistentVolumeClaim:
+            claimName: nginx-pvc
